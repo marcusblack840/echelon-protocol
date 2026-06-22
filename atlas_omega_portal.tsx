@@ -1,0 +1,1173 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Shield, 
+  Clock, 
+  MapPin, 
+  Archive, 
+  Cpu, 
+  Search, 
+  Filter, 
+  ExternalLink, 
+  Flame, 
+  MessageSquare, 
+  Terminal, 
+  CheckCircle, 
+  AlertTriangle,
+  User, 
+  FileText, 
+  ChevronRight,
+  TrendingUp,
+  Lock,
+  Layers,
+  Award,
+  Globe,
+  Coffee
+} from 'lucide-react';
+
+// ==========================================
+// DATA: TIMELINE, VAULT, LORE, REDDIT
+// ==========================================
+
+const TIMELINE_DATA = [
+  {
+    date: "590 BCE",
+    location: "Babylon",
+    figures: ["Nabu-apla-iddina (Royal Engineer)", "Chief Architect"],
+    antics: "Analyzed water-screw irrigation mechanisms on the Hanging Gardens' second terrace; corrected structural and drainage load-bearing calculations on the third terrace.",
+    artifacts: "The Hanging Gardens Tile: Lapis lazuli paving tile inlaid with silver, worn smooth by 30 years of foot traffic.",
+    era: "Ancient"
+  },
+  {
+    date: "480 BCE",
+    location: "Thermopylae, Greece",
+    figures: ["King Leonidas", "Dieneces"],
+    antics: "Advised Leonidas on defensive configurations for the phalanx; fought on the vulnerable right flank; caught a spear mid-air aimed at Leonidas's back. Refused to run, but was ordered out before the final stand.",
+    artifacts: "Leonidas's Sword: Spartan iron and bronze combat sword (worn grip, practical design). Also kept his own Thermopylae Sword.",
+    era: "Ancient"
+  },
+  {
+    date: "479–477 BCE",
+    location: "Athens, Greece",
+    figures: ["Athenian Philosopher"],
+    antics: "Met a philosopher in the Agora; confessed to surviving the 'Hot Gates' but refused to speak further. Said of the Spartan stand: 'It was necessary.'",
+    artifacts: "Contextual records of the 'foreign warrior.'",
+    era: "Ancient"
+  },
+  {
+    date: "336 BCE",
+    location: "Macedon / Phrygia",
+    figures: ["Alexander the Great"],
+    antics: "Tamed the warhorse Bucephalus by identifying its shadow-shyness and turning it towards the sun; watched Alexander slice the Gordian Knot; warned him against overexpansion. Left the campaign when Alexander stopped listening.",
+    artifacts: "Strategic Insights: Learned that conquerors stop pushing back when the maps get too big.",
+    era: "Ancient"
+  },
+  {
+    date: "218 BCE",
+    location: "Carthage / Rome",
+    figures: ["Hannibal"],
+    antics: "Fought as a 'Greek mercenary' for Carthage during the Second Punic War because he assessed Rome as the unjust aggressor.",
+    artifacts: "Earliest recorded combat notes against Rome.",
+    era: "Ancient"
+  },
+  {
+    date: "73 BCE",
+    location: "Rome",
+    figures: ["Spartacus", "Roman Senators"],
+    antics: "Argued in the Roman Forum against the morality of slavery using the Socratic method; confused guards with philosophical questioning to escape arrest.",
+    artifacts: "Socrates' Legacy: Polished Socratic debating tactics to troll Roman elites.",
+    era: "Ancient"
+  },
+  {
+    date: "49–44 BCE",
+    location: "Alexandria, Egypt & Rome",
+    figures: ["Julius Caesar", "Cleopatra VII"],
+    antics: "Met Cleopatra in Egypt and helped with Greek administrative translations; rode to the Rubicon with Julius Caesar; warned Caesar directly: 'Julius, people are going to go through with the knife thing.'",
+    artifacts: "The Caesar Coin: Silver denarius personally given to him by Caesar at the Rubicon. The Cleopatra Ring: Gold and sapphire ring bearing the Ptolemaic seal.",
+    era: "Ancient"
+  },
+  {
+    date: "33 AD",
+    location: "Jerusalem, Judea",
+    figures: ["Passerby", "Disciples"],
+    antics: "Walked the streets of Jerusalem during a historically significant Passover; collected a discarded piece of pottery.",
+    artifacts: "The Jerusalem Cup: Simple clay/ceramic cup (believed by Vatican scholars to be the Holy Grail). Stored sealed in the Munich crate.",
+    era: "Ancient"
+  },
+  {
+    date: "500 CE",
+    location: "Somerset, Britain",
+    figures: ["King Arthur", "Merlin", "Mordred"],
+    antics: "Registered phonetically by a scribe as 'Percival'; negotiated a 'no-kneeling' oath policy; sat at the Round Table; warned Arthur that Mordred was a threat. Fought at the Battle of Camlann.",
+    artifacts: "Excalibur (?): Gold-inlaid steel sword of legendary craftsmanship. Handed to him by Morgana after Arthur's death.",
+    era: "Medieval"
+  },
+  {
+    date: "800–814 CE",
+    location: "Carolingian Empire",
+    figures: ["Charlemagne (Charles the Great)"],
+    antics: "Accidentally left tokens of gratitude at his door in his sleep; reluctantly accepted a royal crown to be polite; wore it once.",
+    artifacts: "Charlemagne's Crown: Gold crown adorned with rubies and emeralds. Left on the floor of his property in 1814 because it was 'too heavy.'",
+    era: "Medieval"
+  },
+  {
+    date: "999 CE",
+    location: "Norway / Vinland",
+    figures: ["Leif Erikson", "Gunnar", "Ulf"],
+    antics: "Went by the alias 'Pér'; challenged 30 Vikings to a drinking contest to stop their boasting; beat Gunnar and Ulf; sailed west on a longship to Vinland.",
+    artifacts: "The Vinland Revelation: Realized he stood on a completely new continent 500 years before Columbus.",
+    era: "Medieval"
+  },
+  {
+    date: "1096–1150 CE",
+    location: "Antioch & Damascus",
+    figures: ["Hugh de Payens", "Everard des Barres", "Pope Honorius II"],
+    antics: "Joined the Knights Templar as 'Petros of Antioch'; refused standard oaths; negotiated unique rank of Summus Magister Maximus; folded mantle and left in 1147 to advise Damascus forces to save lives.",
+    artifacts: "The Templar Scepter: Gold and ivory scepter. Official rank of Summus Magister Maximus logged permanently in the Vatican archives.",
+    era: "Medieval"
+  },
+  {
+    date: "1415 CE",
+    location: "Agincourt, France",
+    figures: ["Henri de Beaumont"],
+    antics: "Challenged an insufferable, arrogant French knight to a duel using only chickens; threw his chicken ('Sir Clucksalot') into Henri's face, winning the duel.",
+    artifacts: "Sir Clucksalot: A remarkably calm chicken, released unharmed back into a field at dawn.",
+    era: "Medieval"
+  },
+  {
+    date: "1494–1519 CE",
+    location: "Florence, Italy / Amboise, France",
+    figures: ["Leonardo da Vinci", "Francesco Melzi"],
+    antics: "Debated hydraulic engineering; identified three physics errors in Leonardo's flying machine sketches; stood in the circle-and-square pose for the Vitruvian Man sketch for over 2 hours.",
+    artifacts: "Da Vinci's Notebook: Personal leather-bound notebook containing the original Vitruvian Man drawing on the cover.",
+    era: "Renaissance"
+  },
+  {
+    date: "1583–1584 CE",
+    location: "London, England",
+    figures: ["Queen Elizabeth I", "Sir Francis Walsingham"],
+    antics: "Operating as a merchant named 'Piers'; discovered a Spanish assassination plot; reluctantly knighted by Queen Elizabeth I, creating a 1583 standing Crown law protecting him from arrest.",
+    artifacts: "Knighthood of the Realm: Legal immunity under 442-year-old British law.",
+    era: "Renaissance"
+  },
+  {
+    date: "1592–1612 CE",
+    location: "London, England",
+    figures: ["William Shakespeare"],
+    antics: "Swapped stories with Will over wine at the Mermaid Tavern (told him the stories of Hamlet, Romeo & Juliet, and Macbeth); complained about Will killing off Juliet and changing the cities.",
+    artifacts: "The Shakespeare Manuscripts: 7 original handwritten plays (including Hamlet, Romeo & Juliet, Macbeth).",
+    era: "Renaissance"
+  },
+  {
+    date: "1678 CE",
+    location: "London, England",
+    figures: ["Jonathan Whitmore I"],
+    antics: "Established a perpetual, multi-generational retainer with the law firm Whitmore, Sterling & Associates to handle his estate and identity cycles.",
+    artifacts: "Private Journal Project: Initiated the firm's legendary, secret multi-generational journal.",
+    era: "Modern"
+  },
+  {
+    date: "1815 CE",
+    location: "Waterloo, Belgium",
+    figures: ["Duke of Wellington", "British Officers"],
+    antics: "Sat on a hill eating bread and cheese; warned an officer that Wellington's left flank was weak, saving the battle.",
+    artifacts: "Belgian Bread: Highly rated (9/10).",
+    era: "Modern"
+  },
+  {
+    date: "1861–1865 CE",
+    location: "Washington, D.C. / Gettysburg",
+    figures: ["Abraham Lincoln", "William H. Seward"],
+    antics: "Met Lincoln seven times; teased him about using his stovepipe hat as a filing system; walked between battle lines during a lull at Gettysburg collecting wildflowers to give to soldiers.",
+    artifacts: "The Gettysburg Address: Personal, handwritten copy gifted to him by Lincoln.",
+    era: "Modern"
+  },
+  {
+    date: "1905–1951 CE",
+    location: "Bern, Switzerland / Princeton, USA",
+    figures: ["Albert Einstein"],
+    antics: "Met patent clerk Einstein in a café in Bern in 1905 to discuss light; met again on Einstein's 72nd birthday in 1951 and dared him to do something unexpected for the camera.",
+    artifacts: "The Einstein Portrait: The iconic, globally recognized photograph of Albert Einstein sticking out his tongue.",
+    era: "Modern"
+  },
+  {
+    date: "1914 CE",
+    location: "Flanders, Belgium",
+    figures: ["Sergeant Davies (UK)", "Lieutenant Horstmann (Germany)"],
+    antics: "Operating under the alias 'Patrick'; walked through eleven sectors of trenches planting the seed of a holiday truce on Christmas Eve.",
+    artifacts: "The Christmas Truce: Facilitated one day of peace in the middle of WWI.",
+    era: "Modern"
+  },
+  {
+    date: "1939–1945 CE",
+    location: "Europe / Poland",
+    figures: ["Winston Churchill", "FDR", "Joseph Stalin"],
+    antics: "Prevented the Tehran Conference German assassination plot (1943); stopped a chemical attack on London; fooled a Nazi officer in Dijon by turning his resistance cell into a musical theater troupe; spent 3 days telling jokes to POW guards to allow escape.",
+    artifacts: "The OSS Dossier: Highly redacted files.",
+    era: "Modern"
+  },
+  {
+    date: "1947 CE",
+    location: "New York City, USA",
+    figures: ["President Harry S. Truman", "James Forrestal", "J. Edgar Hoover"],
+    antics: "Arrested by the FBI for eliminating child traffickers; called Forrestal; Truman signed the Echelon Protocol to prevent future arrests.",
+    artifacts: "Echelon Protocol: Implementation of the 17-minute military extraction mandate.",
+    era: "Modern"
+  },
+  {
+    date: "1986 CE",
+    location: "Moscow, USSR",
+    figures: ["Petrov (KGB Supervisor)"],
+    antics: "Captured in Lubyanka Prison; lost chess games to guards to establish a betting pool; bet his secret of youth against walking out the front door; won, and left a note rating the prison food '3/10.'",
+    artifacts: "The KGB File: Documented evidence of the great chess hustle.",
+    era: "Modern"
+  },
+  {
+    date: "2019 CE",
+    location: "Northern Territory, Australia",
+    figures: ["Big Dave (6-meter Saltwater Crocodile)"],
+    antics: "Wrestled a giant crocodile over territory for 4 minutes; won, let it live, but lost his left boot to the river.",
+    artifacts: "Crocodile Policy: Australian intelligence policy that anyone who wrestles Dave stays unmolested.",
+    era: "Modern"
+  },
+  {
+    date: "2024–2025 CE",
+    location: "New York & Seattle",
+    figures: ["Directors Chen, Cartwright", "Agents Afferty & Rodriguez"],
+    antics: "Arrested by the FBI; extracted in 16 mins, 43 seconds; DNI implements red database flag; Agent Maria Rodriguez follows protocol. Amateurs kidnap him in Queens; he breaks his zip ties when they drop his Caesar coin, then helps them surrender and resolve their debts.",
+    artifacts: "Red Database Flag: Pop-up added to all global intelligence databases.",
+    era: "Modern"
+  },
+  {
+    date: "2028 CE",
+    location: "London, England",
+    figures: ["Richard Ashworth IV"],
+    antics: "Attended the 350th Anniversary of Whitmore, Sterling & Associates. Brought lemon cardamom cookies.",
+    artifacts: "The WSA Ledger: Formalized 350-year client record.",
+    era: "Modern"
+  }
+];
+
+const VAULT_INVENTORY = [
+  { id: "#0001", type: "Weapons", name: "Iron & Bronze Spartan Sword", age: "~3,000 Yrs", value: "€15M-20M", note: "Used at Thermopylae. Kept for sentimental reasons. Please don't touch, still sharp." },
+  { id: "#0043", type: "Weapons", name: "Gold-Inlaid Steel Sword (Excalibur)", age: "~1,500 Yrs", value: "€50M-75M", note: "Found this in a lake after Arthur died. Don't ask. Not saying it's Excalibur but I'm not saying it's NOT Excalibur either." },
+  { id: "#0089", type: "Weapons", name: "Iron-Tip Roman Spear", age: "~2,000 Yrs", value: "€30M-40M", note: "Got this from a Roman soldier who didn't need it anymore. Long story. Shaft rots so I replace it every few centuries. Tip is original." },
+  { id: "#0234", type: "Weapons", name: "Jeweled Babylonian Bronze Dagger", age: "~4,000 Yrs", value: "€25M-35M", note: "Gift from a king whose name nobody remembers. The irony is not lost on me." },
+  { id: "#0456", type: "Regalia", name: "Carolingian Crown (Charlemagne)", age: "~1,200 Yrs", value: "€40M-60M", note: "Charlemagne gave me this. I told him I didn't want it. He insisted. I wore it once to be polite. It's been in storage ever since. Too heavy." },
+  { id: "#0523", type: "Regalia", name: "Holy Roman Empire Scepter", age: "~800 Yrs", value: "€20M-30M", note: "Payment for services rendered. Felt weird accepting it but the guy was insistent. Never used it. What do you even do with a scepter?" },
+  { id: "#0687", type: "Regalia", name: "Sapphire Seal Ring of Cleopatra VII", age: "~2,100 Yrs", value: "€35M-50M", note: "Cleopatra gave me this. Yes, THAT Cleopatra. No, we were not romantically involved. She was politically brilliant and I helped with some Greek translations. Friends only. Stop asking." },
+  { id: "#1043", type: "Religious", name: "Gold-Plated Acacia Chest (The Ark)", age: "~3,000 Yrs", value: "Incalculable", note: "Look, I KNOW what this is. You know what this is. I'm not opening it. Have you SEEN Raiders of the Lost Ark? I'm not risking face-melting. It stays sealed." },
+  { id: "#1087", type: "Religious", name: "Simple Judean Ceramic Cup", age: "~2,000 Yrs", value: "Incalculable", note: "Found in Jerusalem around 33 AD. Might be nothing. Might be something. Not sure. Keeping it just in case. Vatican is VERY interested." },
+  { id: "#1203", type: "Religious", name: "Sinai Stone Tablet Fragments", age: "~3,400 Yrs", value: "Incalculable", note: "Found these near Mount Sinai. They're probably not THE tablets but they're from around the right time and place. Moses didn't sign them." },
+  { id: "#2034", type: "Documents", name: "47 Greek Papyrus Scrolls (Alexandria)", age: "~2,300 Yrs", value: "Incalculable", note: "Borrowed these from the Library of Alexandria. Was going to return them but then there was that fire incident. Seemed rude to bring them back after that. Oops." },
+  { id: "#2156", type: "Documents", name: "da Vinci's Personal Notebook", age: "~500 Yrs", value: "€100M-150M", note: "Leonardo's personal notebook. He gave it to me before he died. Cover has his Vitruvian Man sketch. Inside is mostly his rambling about flying machines. Miss that guy." },
+  { id: "#2267", type: "Documents", name: "7 Original Shakespeare Manuscripts", age: "~425 Yrs", value: "€200M+", note: "Originals of Hamlet, Romeo & Juliet, Macbeth, etc. Based on stories I told him. Told him about a Danish prince, boom - Hamlet. Never got royalties." },
+  { id: "#3045", type: "Artifacts", name: "Hanging Gardens Lapis & Silver Tile", age: "~2,600 Yrs", value: "€40M-60M", note: "Tile from the Hanging Gardens. Got it as a gift for helping with engineering advice. Beautiful craftsmanship. Gardens were genuinely impressive." }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('summary');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [oeeExpanded, setOeeExpanded] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('30 Days');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [eraFilter, setEraFilter] = useState('All');
+  const [inventorySearch, setInventorySearch] = useState('');
+  const [inventoryFilter, setInventoryFilter] = useState('All');
+  
+  // Terminal State for Echelon Activation
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalLogs, setTerminalLogs] = useState([
+    "SECURE OMEGA ACCESS STATION INITIALIZED...",
+    "ECHELON PROTOCOL READY. CURRENT EXTRACT WINDOW: 17 MINS.",
+    "ENTER AUTHORIZATION PHRASE TO COMMENCE EXTRACTION SEQUENCE."
+  ]);
+  const [isEchelonGo, setIsEchelonGo] = useState(false);
+
+  // Time & Status simulation
+  const [currentTime, setCurrentTime] = useState('');
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleString('en-US', { timeZone: 'CET', hour12: true }));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleTerminalSubmit = (e) => {
+    e.preventDefault();
+    const input = terminalInput.trim();
+    if (!input) return;
+
+    setTerminalLogs(prev => [...prev, `> ${input}`]);
+    
+    if (input.toLowerCase() === 'november-hotel-seven-seven-three-nine') {
+      setIsEchelonGo(true);
+      setTerminalLogs(prev => [
+        ...prev,
+        "AUTHENTICATING AUTHORIZATION CODE...",
+        "ACCESS GRANTED. AUTHORIZED IDENTIFIER: PERSEUS JACKSON.",
+        "STATUS: OMEGA-LEVEL CLASS DIRECTIVE ISSUED.",
+        "GHOST PROTOCOL ACTIVATED.",
+        "SEAL TEAM 6 / JSOC OPERATORS RETRIEVED FROM FORT BRAGG.",
+        "BLACK HELICOPTERS EN ROUTE TO MANHATTAN FIELD OFFICE.",
+        "ETA DETENTION FACILITY: 16 MINUTES, 43 SECONDS."
+      ]);
+    } else {
+      setTerminalLogs(prev => [
+        ...prev,
+        "ACCESS DENIED. INVALID CREDENTIALS OR CODE PHRASE.",
+        "WARNING: SECURE CONNECTION LOGGED. DO NOT DETAIN IDENTIFIER PERSEUS."
+      ]);
+    }
+    setTerminalInput('');
+  };
+
+  // 9 Core File Blocks for Summary Dashboard Grid
+  const coreFiles = [
+    {
+      id: "oee",
+      title: "OMEGA ECHELON MATRIX (OEE)",
+      status: "STRICT WATCH",
+      desc: "Comprehensive operational efficiency matrix tracking international containment and immunity compliance.",
+      metric: "99.4% Safety Rating",
+      color: "border-cyan-500",
+      content: {
+        header: "OMEGA-LEVEL ADAPTIVE SECURITY COMPLIANCE",
+        body: "Calculated across 2,500 years of successful extraction cycles. The Echelon system represents the ultimate barrier between our immortal asset and bureaucratic overreach.",
+        quote: "The French were dramatic in 2018. The Russians swore in 2015. The Germans almost avoided it in 2019 by actually reading their database flags.",
+        stats: [
+          { label: "AVAILABILITY", val: "100.0% (Sovereign Immunity)" },
+          { label: "PERFORMANCE", val: "16m 43s JSOC Air Deployment" },
+          { label: "QUALITY RATE", val: "99.4% (Zero Lethal Incidents)" }
+        ]
+      }
+    },
+    {
+      id: "downtime",
+      title: "HISTORICAL OUTAGES / DOWNTIME",
+      status: "5 DETENTIONS RECORDED",
+      desc: "Detailed forensic tracking of every historical instance where Perseus was detained by state apparatuses.",
+      metric: "5 incidents in 78 Yrs",
+      color: "border-amber-500",
+      content: {
+        header: "SYSTEM DETENTION & ARREST AUDIT LOG",
+        body: "A historical report tracking our biggest structural failures. Our decentralized apparatus has led to three domestic and two foreign arrests.",
+        quote: "Stupid is stupid, James! You cannot fix stupid with a database! The US is the country with the most arrests. Three times for you, one time for us, one time for Russia. You win! Incompetence champion!",
+        stats: [
+          { label: "USA ARRESTS", val: "1947, 2024, 2025 (Resolved Cleanly)" },
+          { label: "FRENCH OUTAGE", val: "2018 Paris (Croissant Pretext)" },
+          { label: "SOVIET OUTAGE", val: "1986 Moscow Lubyanka (Chess Hustle)" }
+        ]
+      }
+    },
+    {
+      id: "defects",
+      title: "BUREAUCRATIC STUPIDITY REPORT",
+      status: "UNDER ANALYSIS",
+      desc: "Annual diagnostic file reviewing how federal agencies continuously fail to check high-level databases.",
+      metric: "Red Alert Override Active",
+      color: "border-rose-500",
+      content: {
+        header: "THE RED SCREEN PROTOCOL UPGRADE",
+        body: "Following the 2024 CIA containment disaster, DNI Cartwright ordered a complete technical overhaul. A bright red database flag now populates all federal systems to shock analysts into compliance.",
+        quote: "One suggestion: make the flag bright red and impossible to miss. I've seen too many agents who skim database results. Tell the French the fruit basket thing is funny. They need the win after 2018.",
+        stats: [
+          { label: "DATABASE POP-UP", val: "⚠️ CRITICAL ALERT: DO NOT DETAIN" },
+          { label: "RESPONSE RULE", val: "Manual Acknowledgment Required" },
+          { label: "PENALTY THREAT", val: "Full Federal Prosecution for Violations" }
+        ]
+      }
+    },
+    {
+      id: "rework",
+      title: "DIPLOMATIC REMEDIATION (REWORK)",
+      status: "FRUIT BASKET LOG",
+      desc: "Detailed record of international diplomatic taunting and fruit basket deliveries.",
+      metric: "100% Smugness Index",
+      color: "border-emerald-500",
+      content: {
+        header: "THE DIPLOMATIC FRUIT BASKET TRADITION",
+        body: "A long-standing history of extreme pettiness and competitive mocking between allied and adversarial intelligence networks regarding Perseus's arrests.",
+        quote: "Dear James, Congratulations on your recent incident... Enclosed please find a fruit basket as a token of our sympathy. We know the feeling. Best regards, Claude.",
+        stats: [
+          { label: "UK DIPLOMACY", val: "450 Years of Smugness (Elizabethan Law)" },
+          { label: "AUSTRALIAN WAY", val: "Crocodile Wild-Card Exemption (Big Dave)" },
+          { label: "FRENCH DELIVERIES", val: "Meticulous revenge-fruit shipping logs" }
+        ]
+      }
+    },
+    {
+      id: "vault_ledger",
+      title: "SWISS VAULT HIGH-SECURE DIRECTORY",
+      status: "ACTIVE SECURITY",
+      desc: "Climate-controlled 2,500m² subterranean complex in Switzerland holding €20B+ of irreplaceable primary history.",
+      metric: "9,247 Registered Artifacts",
+      color: "border-blue-500",
+      content: {
+        header: "SWISS VAULT ARCHIVE REVEALED",
+        body: "Built in 1803 under a complex trust framework, this highly secure vault is protected by titanium gates, seismic sensors, and UNESCO, Vatican, and military treaties.",
+        quote: "Dr. Whitfield authenticated the cup and has not fully recovered. Dr. Murray held the Cleopatra ring for six hours on the final day. Keep it sealed.",
+        stats: [
+          { label: "SECURITY COST", val: "€20M - €25M Annually" },
+          { label: "ESTABLISHED YEAR", val: "1803 (WSA Legal Framework)" },
+          { label: "PROTECTION MATRIX", val: "FARADAY CAGE / SEISMIC SENSORS" }
+        ]
+      }
+    },
+    {
+      id: "papal_coffee",
+      title: "VATICAN CORRESPONDENCE SECRETS",
+      status: "AUTHENTICATED",
+      desc: "High-level review of our client's 1734 Vatican canonization and current papal coffee pairings.",
+      metric: "Saint status active",
+      color: "border-purple-500",
+      content: {
+        header: "SAINT PERSEUS OF CONSTANTINOPLE (1734)",
+        body: "Pope Clement XII discovered the 1150 Templar rank Petros of Antioch and formalized a joint canonization to grant Sovereign Vatican status.",
+        quote: "The current Pope has been informed he placed third on the party rankings. He texted me that he feels the coffee comment undersells the blend. It is an excellent Ethiopian single-origin.",
+        stats: [
+          { label: "VATICAN DISPATCH", val: "1150 Honorius II 'File under: unusual'" },
+          { label: "SAINTHOOD STATUS", val: "Sovereign Legal Shield" },
+          { label: "POPE COFFEE PAIRING", val: "Yirgacheffe Roast, Floral Notes" }
+        ]
+      }
+    },
+    {
+      id: "templar_ledger",
+      title: "SUMMUS MAGISTER MAXIMUS RANK",
+      status: "SEALED CLASS",
+      desc: "Investigating the legendary 1150 AD Templar custom rank created for Petros of Antioch.",
+      metric: "We Don't Discuss Petros",
+      color: "border-indigo-500",
+      content: {
+        header: "SUMMUS MAGISTER MAXIMUS DECREE",
+        body: "Unique rank established for Perseus around 1150 AD. The rank carries no responsibilities, as Perseus stated definitions become arguments. When the crusades went wrong, he left his mantle folded on a chair and took his sword.",
+        quote: "We don't discuss Petros. The rank of Summus Magister Maximus is unique, permanent, and non-transferable within current Templar successor structures.",
+        stats: [
+          { label: "OATH POLICY", val: "Declined standard oath (Took too many)" },
+          { label: "THE 1995 DECREE", val: "Invoked Summus rank for Paris Croissant extraction" },
+          { label: "TEMPLAR RESPONSE", val: "'We don't discuss Petros' standard" }
+        ]
+      }
+    },
+    {
+      id: "firm_ledger",
+      title: "WHITMORE, STERLING & ASSOCIATES",
+      status: "RETAINER ACTIVE",
+      desc: "Tracking the 350-year-old legal firm managing identity transitions, taxes, properties, and excellent biscuits.",
+      metric: "350 Yrs Legal Fortification",
+      color: "border-teal-500",
+      content: {
+        header: "350 YEARS OF WSA LEGAL PRECEDENT",
+        body: "Established in 1678, WSA has systematically legal-fortified our client's existence across generations. Senior partner Richard Ashworth IV currently manages Patrick Jackson's identity transition.",
+        quote: "Client has managed own affairs for 2,000+ years. He brought excellent biscuits. Orange peel. This will be the best decision the firm ever made.",
+        stats: [
+          { label: "FIRST REGISTER", val: "October 1678 (Devon Property transfer)" },
+          { label: "IDENTITY CYCLES", val: "Every 80-100 Years (Next transition: ~2032)" },
+          { label: "FAVORITE BISCUITS", val: "Orange Peel / Lemon Cardamom" }
+        ]
+      }
+    },
+    {
+      id: "media_fallout",
+      title: "REDDIT MEME OUTBREAK",
+      status: "MONITORED",
+      desc: "Observing r/TheEternalSoldier forum with 4.7 million members analyzing the immortal soldier leaks.",
+      metric: "1.2 Million Upvotes",
+      color: "border-orange-500",
+      content: {
+        header: "r/TheEternalSoldier MASTER BRIEFING",
+        body: "The internet discovered Echelon, the Swiss vault, and the chicken duels. DNI Cartwright's social experiment confirmed 89% positive approval rating for protecting his privacy.",
+        quote: "The memes are indeed hilarious. The John Wick/Mister Rogers comparison is surprisingly apt. Now they want to bake me cookies. Progress.",
+        stats: [
+          { label: "DRAKE MEME", val: "Accidentally arresting the 2,000-year-old" },
+          { label: "AREA 51 FORM", val: "Baking cookies for the immortal soldier" },
+          { label: "SUBREDDIT SIZE", val: "4.7 Million Members and growing" }
+        ]
+      }
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col md:flex-row antialiased overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      
+      {/* SIDEBAR INTELLIGENCE CONSOLE */}
+      <aside className="w-full md:w-64 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800/80 flex flex-col flex-shrink-0">
+        <div className="p-6 border-b border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <div className="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20 text-cyan-400">
+              <Shield className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <h1 className="font-mono font-bold tracking-wider text-sm text-cyan-400">ATLAS PLATFORM</h1>
+              <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">Omega Clearance Portal</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* NAV SECTION */}
+        <nav className="flex-1 p-4 space-y-1">
+          <p className="text-[10px] text-slate-500 font-mono font-bold tracking-widest px-3 uppercase mb-2">OPERATIONS DIRECTIVE</p>
+          
+          <button 
+            onClick={() => { setActiveTab('summary'); setSelectedFile(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 group ${activeTab === 'summary' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-md shadow-cyan-500/5' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}
+          >
+            <span className="flex items-center gap-2">
+              <Layers className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+              SUMMARY DASHBOARD
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+
+          <button 
+            onClick={() => { setActiveTab('production'); setSelectedFile(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 group ${activeTab === 'production' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}
+          >
+            <span className="flex items-center gap-2">
+              <Globe className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+              PRODUCTION (TIMELINE)
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+
+          <button 
+            onClick={() => { setActiveTab('quality'); setSelectedFile(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 group ${activeTab === 'quality' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}
+          >
+            <span className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+              QUALITY (FORUMS & LORE)
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+
+          <button 
+            onClick={() => { setActiveTab('inventory'); setSelectedFile(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 group ${activeTab === 'inventory' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}
+          >
+            <span className="flex items-center gap-2">
+              <Archive className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+              INVENTORY (SWISS VAULT)
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+
+          <button 
+            onClick={() => { setActiveTab('maintenance'); setSelectedFile(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all duration-200 group ${activeTab === 'maintenance' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}
+          >
+            <span className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+              MAINTENANCE (ECHELON)
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        </nav>
+        
+        {/* FOOTER USER CONSOLE */}
+        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="bg-slate-800 p-2 rounded-lg border border-slate-700 text-slate-300">
+                <User className="w-4 h-4" />
+              </div>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+            </div>
+            <div>
+              <p className="text-[11px] font-mono text-slate-300 font-bold">A. FOSTER, DIA</p>
+              <p className="text-[9px] font-mono text-emerald-400">STATUS: AUTHORIZED</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTAINER */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        {/* TOP COMPLIANCE BAR */}
+        <header className="bg-slate-900 border-b border-slate-800/80 px-6 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono tracking-wider">
+              <span>TATA TOYO RADIATOR</span>
+              <ChevronRight className="w-3 h-3 text-slate-600" />
+              <span>TESLA INDIA UNIT</span>
+              <ChevronRight className="w-3 h-3 text-slate-600" />
+              <span className="text-cyan-400">PUNE DIVISION</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-cyan-400" />
+              <h2 className="text-base font-mono font-bold tracking-wider text-slate-200">PROJECT OMEGA COMMAND GATEWAY</h2>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
+            {/* OEE Widget */}
+            <div className="relative">
+              <button 
+                onClick={() => setOeeExpanded(!oeeExpanded)}
+                className="bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all duration-200 text-slate-300 active:scale-95"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
+                <span>OEE MATRIX: <strong className="text-cyan-400">99.4%</strong></span>
+              </button>
+              
+              {/* Expandable OEE dropdown */}
+              {oeeExpanded && (
+                <div className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-xl z-50 space-y-3">
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <span className="font-bold text-xs text-slate-300">REAL-TIME OEE MATRIX</span>
+                    <span className="text-[10px] bg-cyan-500/10 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-500/20">OPERATIONAL</span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">AVAILABILITY:</span>
+                      <span className="text-emerald-400 font-bold">100.0% (IMMUNITY RATING)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">PERFORMANCE:</span>
+                      <span className="text-cyan-400 font-bold">16m 43s EXTRACT SPEED</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">QUALITY RATE:</span>
+                      <span className="text-purple-400 font-bold">99.4% COMPLIANCE</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed border-t border-slate-800 pt-2 font-sans">
+                    Echelon tracking indices monitor the constant adaptive protection mechanism built for the subject since 1947.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Time / System Status */}
+            <div className="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-slate-400">
+              <Clock className="w-3.5 h-3.5 text-cyan-500" />
+              <span>TIME (CET): <strong className="text-slate-200">{currentTime || 'SYS REBOOT...'}</strong></span>
+            </div>
+          </div>
+        </header>
+
+        {/* TAB CONTROLS & DYNAMIC COMPONENT LOADER */}
+        <section className="flex-1 p-6 space-y-6">
+          
+          {/* TAB 1: SUMMARY DASHBOARD */}
+          {activeTab === 'summary' && (
+            <div className="space-y-6">
+              
+              {/* GLOBAL METRIC ALERTS & DIRECTIVE BANNER */}
+              <div className="bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="space-y-1.5 max-w-2xl">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/25">OMEGA SYSTEM ACTIVE</span>
+                      <span className="text-xs font-mono text-slate-500">SYSTEM HEALTH: SECURE</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-mono font-bold text-slate-200">PETROS IMMUNITY EXEMPTION SHIELD</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                      Perseus Jackson (aka Petros of Antioch, Piers, Patrick) is currently logged as fully active. System security flags are deployed across Five Eyes intelligence databases. All domestic and regional containment efforts have been successfully neutralized under current Echelon guidelines.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => { setActiveTab('maintenance'); }}
+                      className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-mono font-bold tracking-wider transition-colors duration-200 shadow-md shadow-cyan-500/10"
+                    >
+                      ACCESS EXTRACTION CONSOLE
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* DASHBOARD FILTERS */}
+              <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <span className="font-mono text-xs text-slate-400 font-bold flex items-center gap-2">
+                  <Filter className="w-3.5 h-3.5 text-cyan-400" />
+                  OMEGA MONITORING FILTERS
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {['24 Hours', '7 Days', '30 Days', '90 Days', 'All Time'].map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => setTimeFilter(option)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold tracking-wider transition-all duration-150 ${timeFilter === option ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800'}`}
+                    >
+                      {option.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3-COLUMN SUMMARY GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {coreFiles.map((file) => (
+                  <div 
+                    key={file.id}
+                    onClick={() => setSelectedFile(file)}
+                    className={`bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 border-l-4 ${file.color} border-t border-r border-b border-slate-800/80 hover:border-cyan-500/30 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg hover:shadow-cyan-500/5 group cursor-pointer flex flex-col justify-between h-[180px]`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">SYS FILE: {file.id.toUpperCase()}</span>
+                        <span className="text-[9px] font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700 uppercase">{file.status}</span>
+                      </div>
+                      <h4 className="font-mono font-bold text-xs text-slate-200 mt-2.5 group-hover:text-cyan-400 transition-colors uppercase">{file.title}</h4>
+                      <p className="text-[11px] text-slate-400 mt-1.5 line-clamp-2 leading-relaxed font-sans">{file.desc}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-t border-slate-800 pt-3 mt-3">
+                      <span className="text-[10px] font-mono text-slate-500">INDEX: <strong className="text-slate-300 font-bold">{file.metric}</strong></span>
+                      <span className="text-[10px] font-mono text-cyan-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform duration-200">
+                        VIEW DATA <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* FULL DETAILED DRAWER/OVERLAY COMPONENT */}
+              {selectedFile && (
+                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 max-w-2xl w-full rounded-2xl shadow-2xl p-6 relative overflow-hidden animate-in fade-in-50 zoom-in-95 duration-200">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl"></div>
+                    <div className="flex justify-between items-start pb-4 border-b border-slate-800">
+                      <div>
+                        <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20 uppercase tracking-widest">DETAILED SECURE REPORT</span>
+                        <h3 className="text-sm font-mono font-bold text-slate-200 mt-2 uppercase">{selectedFile.title}</h3>
+                      </div>
+                      <button 
+                        onClick={() => setSelectedFile(null)}
+                        className="text-slate-400 hover:text-slate-200 font-mono text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg transition-colors border border-slate-700"
+                      >
+                        CLOSE [ESC]
+                      </button>
+                    </div>
+
+                    <div className="mt-6 space-y-4 text-xs">
+                      <div>
+                        <h4 className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Operational Summary</h4>
+                        <p className="text-slate-300 leading-relaxed font-sans mt-1 bg-slate-950/40 p-3 rounded-lg border border-slate-800">
+                          {selectedFile.content.body}
+                        </p>
+                      </div>
+
+                      {/* HISTORICAL SASSY QUOTE */}
+                      {selectedFile.content.quote && (
+                        <div>
+                          <h4 className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Extracted Communications Log / Sassy Note</h4>
+                          <div className="italic text-slate-300 font-sans mt-1 bg-slate-950 p-4 rounded-lg border-l-2 border-cyan-500 relative">
+                            <span className="absolute -top-3 left-4 text-2xl text-cyan-500/40 font-serif">“</span>
+                            <p className="relative z-10 leading-relaxed">
+                              {selectedFile.content.quote}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* STATS MATRIX */}
+                      <div>
+                        <h4 className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-2">Metrics Matrix</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {selectedFile.content.stats.map((stat, idx) => (
+                            <div key={idx} className="bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                              <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">{stat.label}</span>
+                              <p className="text-slate-200 font-mono font-bold text-xs mt-1">{stat.val}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-slate-800 flex justify-between items-center text-[10px] font-mono text-slate-500">
+                      <span>CLASSIFICATION: OMEGA O-994</span>
+                      <span>DIAGNOSTIC STATUS: CLEAN SECURE</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* TAB 2: PRODUCTION TIMELINE */}
+          {activeTab === 'production' && (
+            <div className="space-y-6">
+              
+              {/* TIMELINE CONTROL & SEARCH */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3 className="font-mono text-sm font-bold text-slate-200">HISTORICAL PRODUCTION LOGS</h3>
+                    <p className="text-xs text-slate-400 font-sans leading-relaxed">
+                      Tracking all recorded antics, figures, and artifacts acquired by the Subject across the historical spectrum (2,500 Years).
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    {/* Filter by Era */}
+                    <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-lg p-1">
+                      {['All', 'Ancient', 'Medieval', 'Renaissance', 'Modern'].map((era) => (
+                        <button
+                          key={era}
+                          onClick={() => setEraFilter(era)}
+                          className={`px-3 py-1.5 rounded text-[10px] font-mono font-bold transition-all duration-150 uppercase ${eraFilter === era ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-slate-400 hover:text-slate-200'}`}
+                        >
+                          {era}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative flex-1 lg:flex-initial lg:w-64">
+                      <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                      <input 
+                        type="text"
+                        placeholder="Search timeline..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 hover:border-cyan-500/30 focus:border-cyan-500 focus:outline-none rounded-lg pl-9 pr-4 py-2 text-xs font-mono placeholder:text-slate-500 text-slate-200 transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* TIMELINE CHRONOLOGICAL CASCADE */}
+              <div className="relative border-l-2 border-slate-800/80 pl-6 ml-4 space-y-8 py-4">
+                {TIMELINE_DATA.filter((item) => {
+                  const matchesEra = eraFilter === 'All' || item.era === eraFilter;
+                  const matchesSearch = searchQuery === '' || 
+                    item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.antics.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.artifacts.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.figures.some(f => f.toLowerCase().includes(searchQuery.toLowerCase()));
+                  return matchesEra && matchesSearch;
+                }).map((item, idx) => (
+                  <div key={idx} className="relative group">
+                    
+                    {/* Circle Indicator */}
+                    <span className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-slate-900 border-2 border-cyan-500 group-hover:bg-cyan-400 group-hover:scale-110 transition-all duration-200 z-10"></span>
+                    
+                    {/* Timeline Card */}
+                    <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-xl p-5 hover:border-cyan-500/30 transition-all duration-200 space-y-3">
+                      
+                      {/* Date & Location Header */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-sm font-bold text-cyan-400">{item.date}</span>
+                          <span className="text-slate-500">•</span>
+                          <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+                            {item.location}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20 uppercase tracking-widest">
+                          {item.era} ERA
+                        </span>
+                      </div>
+
+                      {/* Figures Met */}
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Figures Met:</span>
+                        {item.figures.map((fig, fidx) => (
+                          <span key={fidx} className="bg-slate-950 border border-slate-800 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300">
+                            {fig}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Antics */}
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Operational Record & Antics</span>
+                        <p className="text-slate-300 text-xs leading-relaxed font-sans bg-slate-950/40 p-3 rounded-lg border border-slate-800/50">
+                          {item.antics}
+                        </p>
+                      </div>
+
+                      {/* Artifacts Acquired */}
+                      <div className="flex items-start gap-2 bg-slate-950/80 p-3 rounded-lg border border-slate-800 font-sans text-xs">
+                        <Archive className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <strong className="text-slate-300 block font-mono text-[10px] uppercase tracking-wider">Artifact Obtained / Preserved:</strong>
+                          <p className="text-slate-400 mt-0.5">{item.artifacts}</p>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 3: QUALITY (REDDIT & LORE) */}
+          {activeTab === 'quality' && (
+            <div className="space-y-6">
+              
+              {/* HEADER INTEL BANNER */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                  <h3 className="font-mono text-sm font-bold text-slate-200">LEAKED ARCHIVES: r/TheEternalSoldier</h3>
+                  <p className="text-xs text-slate-400 font-sans leading-relaxed">
+                    Analyzing leaked intelligence briefs, community threads, and sovereign mockery cables across international borders.
+                  </p>
+                </div>
+                <div className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 text-xs font-mono flex items-center gap-1.5 animate-pulse">
+                  <Flame className="w-4 h-4" />
+                  REDDIT MEME THREADS RECORD BREAKING
+                </div>
+              </div>
+
+              {/* GRID OF REDDIT THEME DISPATCHES */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                {/* THREAD 1: THE FRUIT BASKET TRADITION */}
+                <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 space-y-4">
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm text-cyan-400"># DISPATCH-001</span>
+                      <span className="text-slate-500">•</span>
+                      <span className="text-[10px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">MOCKERY DISPATCH</span>
+                    </div>
+                    <span className="text-xs font-mono text-slate-400">143.7K UPVOTES</span>
+                  </div>
+                  <h4 className="font-mono font-bold text-xs text-slate-200 uppercase">THE FRUIT BASKET RIVALRY THREAD</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    The ongoing, incredibly petty battle of diplomatic fruit shipping between Western and Eastern intelligence networks. Whenever the USA arrests Perseus, France or the UK ships highly insulting fruit arrangements directly to Fort Meade or Langley.
+                  </p>
+                  
+                  <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 italic text-slate-400 text-xs font-sans relative">
+                    <span className="absolute -top-3 left-4 text-xl text-cyan-500/40 font-serif">“</span>
+                    Dear James, Congratulations on your recent incident... Enclosed please find a fruit basket as a token of our sympathy. We know the feeling. Best regards, Claude (DGSE).
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-[11px] font-mono">
+                    <p className="text-slate-400">u/DeepStateDigger: "Wait, the French sent a fruit basket with a card saying 'Merci for not being stupid like us' after the UK avoided arresting him for a decade? PETTY LEVEL: GOD."</p>
+                    <p className="text-slate-400">u/BritishHumor: "Of course we did. We're British. Smugness is our national pastime."</p>
+                  </div>
+                </div>
+
+                {/* THREAD 2: THE LUBYANKA CHESS HUSTLE */}
+                <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 space-y-4">
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm text-cyan-400"># DISPATCH-002</span>
+                      <span className="text-slate-500">•</span>
+                      <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">KGB ESCAPE HUSTLE</span>
+                    </div>
+                    <span className="text-xs font-mono text-slate-400">412.8K UPVOTES</span>
+                  </div>
+                  <h4 className="font-mono font-bold text-xs text-slate-200 uppercase">THE MOSCOW CHESS RE-EVALUATION</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    In 1986, the Soviet Union held Perseus in Lubyanka Prison. Perseus deliberately lost consecutive chess games to the guards to establish a betting structure, and then wagered his freedom on a final high-stakes game. He won, walked out the front door, and left a note reviewing the food.
+                  </p>
+
+                  <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 italic text-slate-400 text-xs font-sans relative">
+                    <span className="absolute -top-3 left-4 text-xl text-cyan-500/40 font-serif">“</span>
+                    3/10. Food is mediocre. Chess is excellent. Thank you for the game. — P.
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-[11px] font-mono">
+                    <p className="text-slate-400">u/RussianBot_NotReally: "HE HUSTLED THE KGB. Literally. The officer who allowed the bet was demoted immediately. We are still extremely angry."</p>
+                    <p className="text-slate-400">u/AmericanPride: "He spent 3 days playing chess to make sure they let him walk out. Absolute legend."</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* REDDIT COFFEE MEETING DISPATCH */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-3">
+                <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 font-bold">
+                  <Coffee className="w-4 h-4 text-cyan-400" />
+                  THE PAPAL COFFEE DISPATCH (VERIFIED ACCESS)
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                  Vatican documents confirm that Pope Clement XII formalized the canonization of Saint Perseus of Constantinople in 1734. The current Pope retains a close, completely informal coffee meeting connection with Perseus, where they actively debate classic literature and single-origin coffee bean quality.
+                </p>
+                <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-400 space-y-2">
+                  <p>u/Vatican_Definitely_Not_Watching: "His Holiness has reviewed the journal entry and would like it noted that the blend is a single-origin Ethiopian roast from a small cooperative in the Yirgacheffe region. The flavor profile is distinctly floral with notes of bergamot. He is pleased to be third. He maintains his position on Shakespeare."</p>
+                  <p className="text-cyan-400 text-[9px] font-bold">DNI CARTWRIGHT LOG: "YES, THE POPE TEXTED ABOUT THE BLEND. THE COFFEE COMMENT STANDS."</p>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 4: INVENTORY (SWISS VAULT) */}
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              
+              {/* SWISS VAULT SEARCH & HEADER */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3 className="font-mono text-sm font-bold text-slate-200">SWISS VAULT MASTER DIRECTORY</h3>
+                    <p className="text-xs text-slate-400 font-sans leading-relaxed">
+                      Secured 2,500m² subterranean complex holding ancient primary resources. Total value is listed as "Incalculable" for insurance.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    {/* Category Selector */}
+                    <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-lg p-1">
+                      {['All', 'Weapons', 'Regalia', 'Religious', 'Documents', 'Artifacts'].map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setInventoryFilter(cat)}
+                          className={`px-3 py-1.5 rounded text-[10px] font-mono font-bold transition-all duration-150 uppercase ${inventoryFilter === cat ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-slate-400 hover:text-slate-200'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Search Field */}
+                    <div className="relative flex-1 lg:flex-initial lg:w-64">
+                      <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                      <input 
+                        type="text"
+                        placeholder="Search inventory..."
+                        value={inventorySearch}
+                        onChange={(e) => setInventorySearch(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 hover:border-cyan-500/30 focus:border-cyan-500 focus:outline-none rounded-lg pl-9 pr-4 py-2 text-xs font-mono placeholder:text-slate-500 text-slate-200 transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* LIST OF ARTIFACTS AND SASSY NOTES */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {VAULT_INVENTORY.filter((item) => {
+                  const matchesFilter = inventoryFilter === 'All' || item.type === inventoryFilter;
+                  const matchesSearch = inventorySearch === '' || 
+                    item.name.toLowerCase().includes(inventorySearch.toLowerCase()) ||
+                    item.note.toLowerCase().includes(inventorySearch.toLowerCase()) ||
+                    item.id.toLowerCase().includes(inventorySearch.toLowerCase());
+                  return matchesFilter && matchesSearch;
+                }).map((item, idx) => (
+                  <div key={idx} className="bg-slate-900/40 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/30 transition-all duration-200 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm text-cyan-400 font-bold">{item.id}</span>
+                          <span className="text-slate-500">•</span>
+                          <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 uppercase">{item.type}</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-500">AGE: <strong className="text-slate-300 font-bold">{item.age}</strong></span>
+                      </div>
+                      
+                      <h4 className="font-mono font-bold text-xs text-slate-200 uppercase">{item.name}</h4>
+                      
+                      <div className="italic text-slate-300 font-sans text-xs bg-slate-950 p-3 rounded-lg border-l-2 border-amber-500/80">
+                        "{item.note}"
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-800/50 text-[10px] font-mono">
+                      <span className="text-slate-500">INSURANCE ESTIMATE: <strong className="text-emerald-400 font-bold">{item.value}</strong></span>
+                      <span className="text-slate-500">STATUS: <strong className="text-slate-300">SECURE VAULT</strong></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 5: MAINTENANCE (ECHELON INTERACTIVE TERMINAL) */}
+          {activeTab === 'maintenance' && (
+            <div className="space-y-6">
+              
+              {/* ECHELON EXPLAINER BANNER */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                  <h3 className="font-mono text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                    <Terminal className="w-4 h-4 text-rose-500" />
+                    ECHELON SYSTEM OVERRIDE CORE
+                  </h3>
+                  <p className="text-xs text-slate-400 font-sans leading-relaxed">
+                    Test the emergency response system. Entering the classified OMEGA code phrase triggers military Ghost Protocol extraction.
+                  </p>
+                </div>
+                
+                <div className="bg-cyan-500/10 text-cyan-400 px-3 py-1.5 rounded-lg border border-cyan-500/20 text-xs font-mono flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  STRICT STANDBY GHOST PROTOCOL
+                </div>
+              </div>
+
+              {/* COMMAND LINE TERMINAL SIMULATOR */}
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden font-mono text-xs">
+                
+                {/* Terminal Header */}
+                <div className="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between text-slate-400 text-[10px] tracking-wider">
+                  <span>DIRECTORY: OMEGA//ATLAS/ECHELON/RESPONSE</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  </div>
+                </div>
+
+                {/* Log outputs */}
+                <div className="p-5 space-y-2.5 min-h-[300px] text-cyan-400 leading-relaxed overflow-y-auto">
+                  {terminalLogs.map((log, lidx) => (
+                    <div key={lidx} className={`${log.startsWith('>') ? 'text-slate-300 font-bold' : log.includes('GRANTED') || log.includes('ACTIVATED') ? 'text-emerald-400' : 'text-cyan-400'}`}>
+                      {log}
+                    </div>
+                  ))}
+                  
+                  {isEchelonGo && (
+                    <div className="mt-4 p-4 border border-rose-500/30 bg-rose-500/5 rounded-lg flex items-start gap-3 text-rose-400 animate-in fade-in duration-300">
+                      <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0 animate-bounce" />
+                      <div className="space-y-1">
+                        <strong className="text-rose-400 block font-mono text-xs uppercase tracking-wider">GHOST PROTOCOL LAUNCHED</strong>
+                        <p className="text-slate-400 font-sans text-xs">
+                          JSOC helicopters are airborne. Do not, under any circumstances, approach, detain, or interview the subject. Clean extraction is now fully authorized at the highest national security priority level.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Command Input Form */}
+                <form onSubmit={handleTerminalSubmit} className="bg-slate-900 border-t border-slate-800 p-4 flex gap-3">
+                  <span className="text-slate-400 flex items-center">&gt;</span>
+                  <input 
+                    type="text"
+                    value={terminalInput}
+                    onChange={(e) => setTerminalInput(e.target.value)}
+                    placeholder="Enter security auth code (e.g. November-Hotel-Seven-Seven-Three-Nine)..."
+                    className="flex-1 bg-slate-950 border border-slate-800 focus:border-cyan-500 focus:outline-none rounded-lg px-3 py-2 text-xs text-slate-200"
+                  />
+                  <button 
+                    type="submit"
+                    className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs"
+                  >
+                    SUBMIT
+                  </button>
+                </form>
+
+              </div>
+
+            </div>
+          )}
+
+        </section>
+        
+        {/* INTERACTIVE FOOTER */}
+        <footer className="bg-slate-900 border-t border-slate-800/80 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
+          <span>PROJECT OMEGA AT THE ATLAS COMMAND CENTER</span>
+          <span>© 1678 - 2026 WHITMORE, STERLING & ASSOCIATES</span>
+        </footer>
+
+      </main>
+    </div>
+  );
+}
