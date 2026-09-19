@@ -7,7 +7,7 @@ import {
   Globe, Compass, Crosshair, Eye, Coffee, Building2, Key, Layers, Users
 } from 'lucide-react';
 
-// Comprehensive Master Historical Database mapped across exact coordinates (calculated from ~690 BCE birth)
+// Comprehensive Master Historical Database mapped across exact coordinates (calculated from 700 BCE birth)
 const masterTimeline = [
   {
     id: "babylon",
